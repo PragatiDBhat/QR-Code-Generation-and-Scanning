@@ -1,0 +1,153 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator & Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap" rel="stylesheet"> <!-- Google Font -->
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to right, #6a5acd, #8360c3, #a18cd1, #e0c3fc);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2.5em;
+            animation: fadeIn 1s ease-in;
+        }
+
+        form {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: block;
+            color: #e0c3fc;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 20px;
+            width: 80%;
+            max-width: 300px;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #6a5acd;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 1em;
+        }
+
+        button:hover {
+            background-color: #8360c3;
+            transform: scale(1.05);
+        }
+
+        #qr-code-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #qr-code {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #e0c3fc;
+            border-radius: 10px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            label {
+                font-size: 1em;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+
+            button {
+                padding: 8px 15px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>QR Code Generator & Scanner</h1>
+    <form id="qr-form">
+        <label for="message">Enter message to encrypt:</label>
+        <input type="text" id="message" name="message" required>
+        <br><br>
+        <button type="submit">Generate QR Code</button>
+    </form>
+
+    <div id="qr-code-section">
+        <h2>Your Encrypted QR Code:</h2>
+        <img id="qr-code" alt="QR Code will appear here">
+    </div>
+
+    <script>
+        const qrForm = document.getElementById("qr-form");
+        const qrCodeSection = document.getElementById("qr-code-section");
+        const qrCodeImage = document.getElementById("qr-code");
+
+        qrForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const message = document.getElementById("message").value;
+
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const result = await response.json();
+            qrCodeImage.src = `data:image/png;base64,${result.qr_code}`;
+            qrCodeSection.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
